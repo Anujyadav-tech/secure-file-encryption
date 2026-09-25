@@ -883,11 +883,20 @@ def logout():
 
 
 # ==================================================
+# INITIALIZE DATABASE
+# ==================================================
+
+# IMPORTANT:
+# This runs when Flask starts through Gunicorn on Render.
+# It creates the users and files tables automatically.
+
+init_db()
+
+
+# ==================================================
 # START APPLICATION
 # ==================================================
 
 if __name__ == "__main__":
-
-    init_db()
 
     app.run(debug=True)
