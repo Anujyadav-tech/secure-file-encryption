@@ -14,12 +14,19 @@ app.secret_key = "secure_file_encryption_2026"
 
 
 # ==================================================
+# BASE DIRECTORY
+# ==================================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+# ==================================================
 # FOLDERS
 # ==================================================
 
-UPLOAD_FOLDER = "uploads"
-ENCRYPTED_FOLDER = "encrypted_files"
-DECRYPTED_FOLDER = "decrypted_files"
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+ENCRYPTED_FOLDER = os.path.join(BASE_DIR, "encrypted_files")
+DECRYPTED_FOLDER = os.path.join(BASE_DIR, "decrypted_files")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(ENCRYPTED_FOLDER, exist_ok=True)
@@ -34,7 +41,7 @@ app.config["DECRYPTED_FOLDER"] = DECRYPTED_FOLDER
 # ENCRYPTION KEY
 # ==================================================
 
-KEY_FILE = "secret.key"
+KEY_FILE = os.path.join(BASE_DIR, "secret.key")
 
 
 def get_encryption_key():
@@ -61,9 +68,13 @@ fernet = Fernet(get_encryption_key())
 # DATABASE CONNECTION
 # ==================================================
 
+DATABASE = os.path.join(BASE_DIR, "database.db")
+
+
 def get_db():
 
-    conn = sqlite3.connect("database.db")
+    conn = sqlite3.connect(DATABASE)
+
     conn.row_factory = sqlite3.Row
 
     return conn
@@ -179,6 +190,9 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
+        # Make sure database tables exist
+        init_db()
+
         conn = get_db()
 
         try:
@@ -218,6 +232,9 @@ def login():
 
         email = request.form["email"]
         password = request.form["password"]
+
+        # Make sure database tables exist
+        init_db()
 
         conn = get_db()
 
@@ -886,7 +903,6 @@ def logout():
 # INITIALIZE DATABASE
 # ==================================================
 
-# IMPORTANT:
 # This runs when Flask starts through Gunicorn on Render.
 # It creates the users and files tables automatically.
 
