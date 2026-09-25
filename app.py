@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import sqlite3
 import os
+import uuid
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -65,7 +66,7 @@ fernet = Fernet(get_encryption_key())
 
 
 # ==================================================
-# DATABASE CONNECTION
+# DATABASE
 # ==================================================
 
 DATABASE = os.path.join(BASE_DIR, "database.db")
@@ -88,8 +89,7 @@ def init_db():
 
     conn = get_db()
 
-    # ---------------- USERS TABLE ----------------
-
+    # USERS TABLE
     conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,9 +99,7 @@ def init_db():
         )
     """)
 
-
-    # ---------------- FILES TABLE ----------------
-
+    # FILES TABLE
     conn.execute("""
         CREATE TABLE IF NOT EXISTS files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,17 +111,12 @@ def init_db():
         )
     """)
 
-
-    # ==================================================
-    # DATABASE MIGRATION
-    # ==================================================
-
+    # Check existing columns
     columns = conn.execute(
         "PRAGMA table_info(files)"
     ).fetchall()
 
     column_names = [column["name"] for column in columns]
-
 
     # encrypted
     if "encrypted" not in column_names:
@@ -133,7 +126,6 @@ def init_db():
             ADD COLUMN encrypted INTEGER DEFAULT 0
         """)
 
-
     # encrypted_path
     if "encrypted_path" not in column_names:
 
@@ -141,7 +133,6 @@ def init_db():
             ALTER TABLE files
             ADD COLUMN encrypted_path TEXT
         """)
-
 
     # decrypted
     if "decrypted" not in column_names:
@@ -151,7 +142,6 @@ def init_db():
             ADD COLUMN decrypted INTEGER DEFAULT 0
         """)
 
-
     # decrypted_path
     if "decrypted_path" not in column_names:
 
@@ -160,8 +150,8 @@ def init_db():
             ADD COLUMN decrypted_path TEXT
         """)
 
-
     conn.commit()
+
     conn.close()
 
 
@@ -184,13 +174,17 @@ def register():
 
     if request.method == "POST":
 
-        name = request.form["name"]
-        email = request.form["email"]
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
         password = request.form["password"]
+
+        if not name or not email or not password:
+
+            return "All fields are required!"
 
         hashed_password = generate_password_hash(password)
 
-        # Make sure database tables exist
+        # Make sure database exists
         init_db()
 
         conn = get_db()
@@ -203,7 +197,11 @@ def register():
                 (name, email, password)
                 VALUES (?, ?, ?)
                 """,
-                (name, email, hashed_password)
+                (
+                    name,
+                    email,
+                    hashed_password
+                )
             )
 
             conn.commit()
@@ -230,10 +228,9 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form["email"]
+        email = request.form["email"].strip()
         password = request.form["password"]
 
-        # Make sure database tables exist
         init_db()
 
         conn = get_db()
@@ -249,7 +246,6 @@ def login():
 
         conn.close()
 
-
         if user and check_password_hash(
             user["password"],
             password
@@ -261,9 +257,7 @@ def login():
 
             return redirect(url_for("dashboard"))
 
-
         return "Invalid email or password!"
-
 
     return render_template("login.html")
 
@@ -279,9 +273,10 @@ def dashboard():
 
         return redirect(url_for("login"))
 
+    # Make sure database exists
+    init_db()
 
     conn = get_db()
-
 
     # Current user's files
     files = conn.execute(
@@ -294,7 +289,6 @@ def dashboard():
         (session["user_id"],)
     ).fetchall()
 
-
     # Total files
     total_files = conn.execute(
         """
@@ -304,7 +298,6 @@ def dashboard():
         """,
         (session["user_id"],)
     ).fetchone()[0]
-
 
     # Encrypted files
     encrypted_files = conn.execute(
@@ -317,7 +310,6 @@ def dashboard():
         (session["user_id"],)
     ).fetchone()[0]
 
-
     # Decrypted files
     decrypted_files = conn.execute(
         """
@@ -329,9 +321,7 @@ def dashboard():
         (session["user_id"],)
     ).fetchone()[0]
 
-
     conn.close()
-
 
     return render_template(
         "dashboard.html",
@@ -361,64 +351,87 @@ def upload_file():
 
         return redirect(url_for("login"))
 
-
     if "file" not in request.files:
 
         return "No file selected!"
 
-
     file = request.files["file"]
-
 
     if file.filename == "":
 
         return "No file selected!"
 
+    # Secure original filename
+    original_filename = secure_filename(file.filename)
 
-    filename = secure_filename(file.filename)
-
-
-    if not filename:
+    if not original_filename:
 
         return "Invalid file name!"
 
+    # ==================================================
+    # CREATE UNIQUE SERVER FILE NAME
+    # ==================================================
+
+    unique_filename = (
+        uuid.uuid4().hex
+        + "_"
+        + original_filename
+    )
 
     filepath = os.path.join(
         app.config["UPLOAD_FOLDER"],
-        filename
+        unique_filename
     )
 
+    try:
 
-    # Save original file
-    file.save(filepath)
+        # ==================================================
+        # SAVE FILE
+        # ==================================================
 
+        file.save(filepath)
 
-    # Save file information
-    conn = get_db()
+        # ==================================================
+        # SAVE DATABASE INFORMATION
+        # ==================================================
 
-    conn.execute(
-        """
-        INSERT INTO files
-        (
-            user_id,
-            filename,
-            filepath,
-            encrypted,
-            decrypted
+        conn = get_db()
+
+        conn.execute(
+            """
+            INSERT INTO files
+            (
+                user_id,
+                filename,
+                filepath,
+                encrypted,
+                decrypted
+            )
+            VALUES (?, ?, ?, 0, 0)
+            """,
+            (
+                session["user_id"],
+                original_filename,
+                filepath
+            )
         )
-        VALUES (?, ?, ?, 0, 0)
-        """,
-        (
-            session["user_id"],
-            filename,
-            filepath
-        )
-    )
 
+        conn.commit()
 
-    conn.commit()
-    conn.close()
+        conn.close()
 
+    except Exception as e:
+
+        # Remove partially uploaded file
+        if os.path.exists(filepath):
+
+            try:
+                os.remove(filepath)
+
+            except Exception:
+                pass
+
+        return f"Upload failed: {str(e)}"
 
     return redirect(url_for("dashboard"))
 
@@ -434,11 +447,8 @@ def encrypt_file(file_id):
 
         return redirect(url_for("login"))
 
-
     conn = get_db()
 
-
-    # Only current user's file
     file = conn.execute(
         """
         SELECT *
@@ -452,13 +462,11 @@ def encrypt_file(file_id):
         )
     ).fetchone()
 
-
     if not file:
 
         conn.close()
 
         return "File not found!"
-
 
     # Already encrypted
     if file["encrypted"] == 1:
@@ -467,65 +475,70 @@ def encrypt_file(file_id):
 
         return redirect(url_for("dashboard"))
 
-
     original_path = file["filepath"]
 
-
-    if not os.path.exists(original_path):
+    if not original_path or not os.path.exists(original_path):
 
         conn.close()
 
         return "Original file not found!"
 
+    try:
 
-    # Read original file
-    with open(original_path, "rb") as original_file:
+        # Read original file
+        with open(original_path, "rb") as original_file:
 
-        file_data = original_file.read()
+            file_data = original_file.read()
 
+        # Encrypt
+        encrypted_data = fernet.encrypt(file_data)
 
-    # Encrypt
-    encrypted_data = fernet.encrypt(file_data)
-
-
-    # Encrypted filename
-    encrypted_filename = file["filename"] + ".encrypted"
-
-
-    encrypted_path = os.path.join(
-        app.config["ENCRYPTED_FOLDER"],
-        encrypted_filename
-    )
-
-
-    # Save encrypted file
-    with open(encrypted_path, "wb") as encrypted_file:
-
-        encrypted_file.write(encrypted_data)
-
-
-    # Update database
-    conn.execute(
-        """
-        UPDATE files
-
-        SET encrypted = 1,
-            encrypted_path = ?
-
-        WHERE id = ?
-        AND user_id = ?
-        """,
-        (
-            encrypted_path,
-            file_id,
-            session["user_id"]
+        # Create encrypted filename
+        encrypted_filename = (
+            file["filename"]
+            + ".encrypted"
         )
-    )
 
+        encrypted_path = os.path.join(
+            app.config["ENCRYPTED_FOLDER"],
+            encrypted_filename
+        )
 
-    conn.commit()
+        # Save encrypted file
+        with open(
+            encrypted_path,
+            "wb"
+        ) as encrypted_file:
+
+            encrypted_file.write(encrypted_data)
+
+        # Update database
+        conn.execute(
+            """
+            UPDATE files
+
+            SET encrypted = 1,
+                encrypted_path = ?
+
+            WHERE id = ?
+            AND user_id = ?
+            """,
+            (
+                encrypted_path,
+                file_id,
+                session["user_id"]
+            )
+        )
+
+        conn.commit()
+
+    except Exception as e:
+
+        conn.close()
+
+        return f"Encryption failed: {str(e)}"
+
     conn.close()
-
 
     return redirect(url_for("dashboard"))
 
@@ -541,11 +554,8 @@ def decrypt_file(file_id):
 
         return redirect(url_for("login"))
 
-
     conn = get_db()
 
-
-    # Only current user's file
     file = conn.execute(
         """
         SELECT *
@@ -559,94 +569,97 @@ def decrypt_file(file_id):
         )
     ).fetchone()
 
-
     if not file:
 
         conn.close()
 
         return "File not found!"
 
-
-    # File must be encrypted first
+    # Must be encrypted
     if file["encrypted"] != 1:
 
         conn.close()
 
         return "File is not encrypted!"
 
-
     encrypted_path = file["encrypted_path"]
 
+    if not encrypted_path:
 
-    if not encrypted_path or not os.path.exists(encrypted_path):
+        conn.close()
+
+        return "Encrypted file path not found!"
+
+    if not os.path.exists(encrypted_path):
 
         conn.close()
 
         return "Encrypted file not found!"
 
-
-    # Read encrypted file
-    with open(encrypted_path, "rb") as encrypted_file:
-
-        encrypted_data = encrypted_file.read()
-
-
     try:
 
-        # Decrypt
-        decrypted_data = fernet.decrypt(encrypted_data)
+        # Read encrypted file
+        with open(
+            encrypted_path,
+            "rb"
+        ) as encrypted_file:
 
-    except Exception:
+            encrypted_data = encrypted_file.read()
+
+        # Decrypt
+        decrypted_data = fernet.decrypt(
+            encrypted_data
+        )
+
+        # Create decrypted path
+        decrypted_filename = file["filename"]
+
+        decrypted_path = os.path.join(
+            app.config["DECRYPTED_FOLDER"],
+            decrypted_filename
+        )
+
+        # Save decrypted file
+        with open(
+            decrypted_path,
+            "wb"
+        ) as decrypted_file:
+
+            decrypted_file.write(decrypted_data)
+
+        # Update database
+        conn.execute(
+            """
+            UPDATE files
+
+            SET decrypted = 1,
+                decrypted_path = ?
+
+            WHERE id = ?
+            AND user_id = ?
+            """,
+            (
+                decrypted_path,
+                file_id,
+                session["user_id"]
+            )
+        )
+
+        conn.commit()
+
+    except Exception as e:
 
         conn.close()
 
-        return "Decryption failed! The encryption key may be invalid."
+        return f"Decryption failed: {str(e)}"
 
-
-    # Original filename
-    decrypted_filename = file["filename"]
-
-
-    decrypted_path = os.path.join(
-        app.config["DECRYPTED_FOLDER"],
-        decrypted_filename
-    )
-
-
-    # Save decrypted file
-    with open(decrypted_path, "wb") as decrypted_file:
-
-        decrypted_file.write(decrypted_data)
-
-
-    # Update database
-    conn.execute(
-        """
-        UPDATE files
-
-        SET decrypted = 1,
-            decrypted_path = ?
-
-        WHERE id = ?
-        AND user_id = ?
-        """,
-        (
-            decrypted_path,
-            file_id,
-            session["user_id"]
-        )
-    )
-
-
-    conn.commit()
     conn.close()
-
 
     return redirect(url_for("dashboard"))
 
 
 # ==================================================
-# DOWNLOAD ORIGINAL FILE
+# DOWNLOAD ORIGINAL
 # ==================================================
 
 @app.route("/download/original/<int:file_id>")
@@ -656,7 +669,6 @@ def download_original(file_id):
 
         return redirect(url_for("login"))
 
-
     conn = get_db()
 
     file = conn.execute(
@@ -674,19 +686,19 @@ def download_original(file_id):
 
     conn.close()
 
-
     if not file:
 
         return "File not found!"
 
-
     filepath = file["filepath"]
 
+    if not filepath:
 
-    if not filepath or not os.path.exists(filepath):
+        return "Original file path not found!"
+
+    if not os.path.exists(filepath):
 
         return "Original file not found!"
-
 
     return send_file(
         filepath,
@@ -696,7 +708,7 @@ def download_original(file_id):
 
 
 # ==================================================
-# DOWNLOAD ENCRYPTED FILE
+# DOWNLOAD ENCRYPTED
 # ==================================================
 
 @app.route("/download/encrypted/<int:file_id>")
@@ -706,7 +718,6 @@ def download_encrypted(file_id):
 
         return redirect(url_for("login"))
 
-
     conn = get_db()
 
     file = conn.execute(
@@ -724,24 +735,23 @@ def download_encrypted(file_id):
 
     conn.close()
 
-
     if not file:
 
         return "File not found!"
-
 
     if file["encrypted"] != 1:
 
         return "File is not encrypted yet!"
 
-
     encrypted_path = file["encrypted_path"]
 
+    if not encrypted_path:
 
-    if not encrypted_path or not os.path.exists(encrypted_path):
+        return "Encrypted file path not found!"
+
+    if not os.path.exists(encrypted_path):
 
         return "Encrypted file not found!"
-
 
     return send_file(
         encrypted_path,
@@ -751,7 +761,7 @@ def download_encrypted(file_id):
 
 
 # ==================================================
-# DOWNLOAD DECRYPTED FILE
+# DOWNLOAD DECRYPTED
 # ==================================================
 
 @app.route("/download/decrypted/<int:file_id>")
@@ -760,7 +770,6 @@ def download_decrypted(file_id):
     if "user_id" not in session:
 
         return redirect(url_for("login"))
-
 
     conn = get_db()
 
@@ -779,24 +788,23 @@ def download_decrypted(file_id):
 
     conn.close()
 
-
     if not file:
 
         return "File not found!"
-
 
     if file["decrypted"] != 1:
 
         return "File has not been decrypted yet!"
 
-
     decrypted_path = file["decrypted_path"]
 
+    if not decrypted_path:
 
-    if not decrypted_path or not os.path.exists(decrypted_path):
+        return "Decrypted file path not found!"
+
+    if not os.path.exists(decrypted_path):
 
         return "Decrypted file not found!"
-
 
     return send_file(
         decrypted_path,
@@ -816,11 +824,8 @@ def delete_file(file_id):
 
         return redirect(url_for("login"))
 
-
     conn = get_db()
 
-
-    # Only current user's file
     file = conn.execute(
         """
         SELECT *
@@ -834,37 +839,41 @@ def delete_file(file_id):
         )
     ).fetchone()
 
-
     if not file:
 
         conn.close()
 
         return "File not found!"
 
-
-    # Delete original file
+    # Delete original
     original_path = file["filepath"]
 
     if original_path and os.path.exists(original_path):
 
-        os.remove(original_path)
+        try:
+            os.remove(original_path)
+        except Exception:
+            pass
 
-
-    # Delete encrypted file
+    # Delete encrypted
     encrypted_path = file["encrypted_path"]
 
     if encrypted_path and os.path.exists(encrypted_path):
 
-        os.remove(encrypted_path)
+        try:
+            os.remove(encrypted_path)
+        except Exception:
+            pass
 
-
-    # Delete decrypted file
+    # Delete decrypted
     decrypted_path = file["decrypted_path"]
 
     if decrypted_path and os.path.exists(decrypted_path):
 
-        os.remove(decrypted_path)
-
+        try:
+            os.remove(decrypted_path)
+        except Exception:
+            pass
 
     # Delete database record
     conn.execute(
@@ -879,10 +888,9 @@ def delete_file(file_id):
         )
     )
 
-
     conn.commit()
-    conn.close()
 
+    conn.close()
 
     return redirect(url_for("dashboard"))
 
@@ -903,9 +911,6 @@ def logout():
 # INITIALIZE DATABASE
 # ==================================================
 
-# This runs when Flask starts through Gunicorn on Render.
-# It creates the users and files tables automatically.
-
 init_db()
 
 
@@ -915,4 +920,8 @@ init_db()
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
