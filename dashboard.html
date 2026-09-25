@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecureFile - Dashboard</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #071426;
+            color: white;
+            padding: 25px 18px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            padding-left: 10px;
+            color: #38a8ff;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: #d7e2ef;
+            padding: 14px 15px;
+            border-radius: 9px;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #147de6;
+            color: white;
+        }
+
+        .logout {
+            margin-top: auto;
+            text-decoration: none;
+            text-align: center;
+            background: #ef4b35;
+            color: white;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .logout:hover {
+            background: #d93622;
+        }
+
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+            padding: 28px;
+            width: calc(100% - 250px);
+        }
+
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            background: white;
+            padding: 22px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+        }
+
+        .user-info {
+            text-align: right;
+            min-width: 0;
+        }
+
+        .user-info strong {
+            display: block;
+            font-size: 15px;
+            color: #182338;
+        }
+
+        .user-info small {
+            color: #777;
+            overflow-wrap: anywhere;
+        }
+
+
+        /* ================= STAT CARDS ================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #147de6;
+            min-width: 0;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h2 {
+            font-size: 32px;
+            color: #1268c4;
+        }
+
+
+        /* ================= WELCOME ================= */
+
+        .welcome {
+            background: linear-gradient(
+                135deg,
+                #0759b7,
+                #168be8
+            );
+            color: white;
+            padding: 28px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(20, 125, 230, 0.2);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .welcome h2 {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+
+        /* ================= QUICK ACTIONS ================= */
+
+        .section-title {
+            font-size: 23px;
+            margin-bottom: 18px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .action-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            min-width: 0;
+        }
+
+        .action-card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .action-card p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+
+        /* ================= FILE INPUT ================= */
+
+        .file-input {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #d6dce5;
+            border-radius: 7px;
+            background: #fafbfc;
+        }
+
+
+        /* ================= BUTTON ================= */
+
+        .btn {
+            border: none;
+            background: #147de6;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .btn:hover {
+            background: #075fb9;
+        }
+
+        .btn-green {
+            background: #16a05d;
+        }
+
+        .btn-green:hover {
+            background: #0d7f48;
+        }
+
+        .btn-orange {
+            background: #f08a24;
+        }
+
+        .btn-orange:hover {
+            background: #d66f10;
+        }
+
+
+        /* ================= DOWNLOAD BUTTONS ================= */
+
+        .btn-download {
+            background: #5966f2;
+        }
+
+        .btn-download:hover {
+            background: #414dc7;
+        }
+
+        .btn-encrypted {
+            background: #7b4bd6;
+        }
+
+        .btn-encrypted:hover {
+            background: #6035b2;
+        }
+
+        .btn-decrypted {
+            background: #0f9f91;
+        }
+
+        .btn-decrypted:hover {
+            background: #08786d;
+        }
+
+
+        /* ================= DELETE BUTTON ================= */
+
+        .btn-delete {
+            background: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background: #b92333;
+        }
+
+
+        /* ================= MY FILES ================= */
+
+        .files-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .files-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .file-row {
+            border: 1px solid #e3e8ef;
+            border-radius: 9px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        .file-info {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: #172033;
+            margin-bottom: 7px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .file-date {
+            font-size: 12px;
+            color: #888;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 7px;
+            margin-right: 5px;
+            font-size: 12px;
+            padding: 5px 9px;
+            border-radius: 20px;
+        }
+
+        .not-encrypted {
+            background: #fff3cd;
+            color: #8a6500;
+        }
+
+        .encrypted {
+            background: #d9f7e7;
+            color: #08783d;
+        }
+
+        .decrypted {
+            background: #dceeff;
+            color: #075da8;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 100%;
+        }
+
+        .file-actions form {
+            max-width: 100%;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .stats,
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            /* ---------- SIDEBAR ---------- */
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                min-height: auto;
+                padding: 18px 15px;
+            }
+
+            .logo {
+                margin-bottom: 20px;
+                padding-left: 5px;
+            }
+
+            .menu {
+                flex-direction: column;
+                width: 100%;
+                gap: 5px;
+            }
+
+            .menu a {
+                width: 100%;
+                padding: 11px 12px;
+            }
+
+            .logout {
+                width: 100%;
+                margin-top: 15px;
+            }
+
+
+            /* ---------- MAIN ---------- */
+
+            .main {
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0;
+                padding: 12px;
+                overflow-x: hidden;
+            }
+
+
+            /* ---------- TOPBAR ---------- */
+
+            .topbar {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 18px;
+            }
+
+            .topbar h1 {
+                font-size: 24px;
+            }
+
+            .user-info {
+                width: 100%;
+                text-align: left;
+                overflow-wrap: anywhere;
+            }
+
+
+            /* ---------- STATISTICS ---------- */
+
+            .stats {
+                width: 100%;
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                width: 100%;
+                padding: 20px;
+            }
+
+
+            /* ---------- WELCOME ---------- */
+
+            .welcome {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .welcome h2 {
+                font-size: 21px;
+                line-height: 1.3;
+            }
+
+            .welcome p {
+                line-height: 1.6;
+            }
+
+
+            /* ---------- QUICK ACTIONS ---------- */
+
+            .actions {
+                width: 100%;
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .action-card {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 21px;
+            }
+
+
+            /* ---------- FILE INPUT ---------- */
+
+            .file-input {
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+
+            /* ---------- BUTTONS ---------- */
+
+            .btn {
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+
+            /* ---------- MY FILES ---------- */
+
+            .files-section {
+                width: 100%;
+                max-width: 100%;
+                padding: 18px;
+                overflow: hidden;
+            }
+
+            .file-list {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .file-row {
+                width: 100%;
+                max-width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                overflow: hidden;
+            }
+
+            .file-info {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .file-name {
+                width: 100%;
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .file-date {
+                max-width: 100%;
+                overflow-wrap: anywhere;
+            }
+
+
+            /* ---------- FILE ACTIONS ---------- */
+
+            .file-actions {
+                width: 100%;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+
+            .file-actions .btn,
+            .file-actions form {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .file-actions form .btn {
+                width: 100%;
+            }
+
+        }
+
+
+        /* ================= SMALL PHONES ================= */
+
+        @media (max-width: 400px) {
+
+            .sidebar {
+                padding: 15px 12px;
+            }
+
+            .main {
+                padding: 10px;
+            }
+
+            .topbar {
+                padding: 15px;
+            }
+
+            .topbar h1 {
+                font-size: 22px;
+            }
+
+            .stat-card {
+                padding: 17px;
+            }
+
+            .stat-card h2 {
+                font-size: 28px;
+            }
+
+            .welcome {
+                padding: 17px;
+            }
+
+            .welcome h2 {
+                font-size: 19px;
+            }
+
+            .action-card {
+                padding: 17px;
+            }
+
+            .files-section {
+                padding: 15px;
+            }
+
+            .file-row {
+                padding: 13px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .status {
+                margin-right: 3px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     SIDEBAR
+================================================== -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        🔐 Secure<span>File</span>
+    </div>
+
+
+    <div class="menu">
+
+        <a href="{{ url_for('dashboard') }}" class="active">
+            🏠 Dashboard
+        </a>
+
+        <a href="#upload">
+            📤 Upload File
+        </a>
+
+        <a href="#my-files">
+            📁 My Files
+        </a>
+
+        <a href="#my-files">
+            🔒 Encrypt File
+        </a>
+
+        <a href="#my-files">
+            🔓 Decrypt File
+        </a>
+
+    </div>
+
+
+    <a href="{{ url_for('logout') }}" class="logout">
+        Logout
+    </a>
+
+</div>
+
+
+
+<!-- ==================================================
+     MAIN CONTENT
+================================================== -->
+
+<div class="main">
+
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <h1>
+            Dashboard
+        </h1>
+
+
+        <div class="user-info">
+
+            <strong>
+                Rishabh Singh
+            </strong>
+
+            <small>
+                {{ email }}
+            </small>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         STATISTICS
+    ================================================== -->
+
+    <div class="stats">
+
+
+        <div class="stat-card">
+
+            <h3>
+                Total Files
+            </h3>
+
+            <h2>
+                {{ total_files }}
+            </h2>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <h3>
+                Encrypted Files
+            </h3>
+
+            <h2>
+                {{ encrypted_files }}
+            </h2>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <h3>
+                Decrypted Files
+            </h3>
+
+            <h2>
+                {{ decrypted_files }}
+            </h2>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         WELCOME
+    ================================================== -->
+
+    <div class="welcome">
+
+        <h2>
+            Welcome, Rishabh Singh 👋
+        </h2>
+
+        <p>
+            SecureFile is a secure file encryption system
+            designed to protect your important files using
+            modern encryption techniques.
+        </p>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         QUICK ACTIONS
+    ================================================== -->
+
+    <h2 class="section-title">
+        Quick Actions
+    </h2>
+
+
+    <div class="actions">
+
+
+        <!-- UPLOAD -->
+
+        <div class="action-card" id="upload">
+
+            <h3>
+                📤 Upload File
+            </h3>
+
+            <p>
+                Select an important file and upload it securely.
+            </p>
+
+
+            <form
+                action="{{ url_for('upload_file') }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="file"
+                    name="file"
+                    class="file-input"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Upload File
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ENCRYPT -->
+
+        <div class="action-card">
+
+            <h3>
+                🔒 Encrypt File
+            </h3>
+
+            <p>
+                Select an uploaded file from My Files
+                and click the Encrypt button.
+            </p>
+
+
+            <a href="#my-files" class="btn">
+                View Files
+            </a>
+
+        </div>
+
+
+
+        <!-- DECRYPT -->
+
+        <div class="action-card">
+
+            <h3>
+                🔓 Decrypt File
+            </h3>
+
+            <p>
+                Decrypt your encrypted files and restore
+                the original file.
+            </p>
+
+
+            <a href="#my-files" class="btn btn-orange">
+                View Files
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         MY FILES
+    ================================================== -->
+
+    <div class="files-section" id="my-files">
+
+        <h2>
+            📁 My Files
+        </h2>
+
+
+        {% if files %}
+
+        <div class="file-list">
+
+
+            {% for file in files %}
+
+            <div class="file-row">
+
+
+                <!-- FILE INFORMATION -->
+
+                <div class="file-info">
+
+                    <div class="file-name">
+
+                        📄 {{ file["filename"] }}
+
+                    </div>
+
+
+                    <div class="file-date">
+
+                        Uploaded:
+                        {{ file["uploaded_at"] }}
+
+                    </div>
+
+
+                    {% if file["encrypted"] == 1 %}
+
+                        <span class="status encrypted">
+                            🔒 Encrypted
+                        </span>
+
+                    {% else %}
+
+                        <span class="status not-encrypted">
+                            🔓 Not Encrypted
+                        </span>
+
+                    {% endif %}
+
+
+                    {% if file["decrypted"] == 1 %}
+
+                        <span class="status decrypted">
+                            ✓ Decrypted
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- FILE ACTIONS -->
+
+                <div class="file-actions">
+
+
+                    <!-- ORIGINAL DOWNLOAD -->
+
+                    <a
+                        href="{{ url_for('download_original', file_id=file['id']) }}"
+                        class="btn btn-download"
+                    >
+                        📥 Original
+                    </a>
+
+
+                    <!-- ENCRYPT BUTTON -->
+
+                    {% if file["encrypted"] == 0 %}
+
+                    <form
+                        action="{{ url_for('encrypt_file', file_id=file['id']) }}"
+                        method="POST"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn"
+                        >
+                            🔒 Encrypt
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+
+                    <!-- ENCRYPTED DOWNLOAD + DECRYPT -->
+
+                    {% if file["encrypted"] == 1 %}
+
+                    <a
+                        href="{{ url_for('download_encrypted', file_id=file['id']) }}"
+                        class="btn btn-encrypted"
+                    >
+                        🔐 Encrypted
+                    </a>
+
+
+                    <form
+                        action="{{ url_for('decrypt_file', file_id=file['id']) }}"
+                        method="POST"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn btn-green"
+                        >
+                            🔓 Decrypt
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+
+                    <!-- DECRYPTED DOWNLOAD -->
+
+                    {% if file["decrypted"] == 1 %}
+
+                    <a
+                        href="{{ url_for('download_decrypted', file_id=file['id']) }}"
+                        class="btn btn-decrypted"
+                    >
+                        📥 Decrypted
+                    </a>
+
+                    {% endif %}
+
+
+
+                    <!-- DELETE BUTTON -->
+
+                    <form
+                        action="{{ url_for('delete_file', file_id=file['id']) }}"
+                        method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this file?');"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn btn-delete"
+                        >
+                            🗑 Delete
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty">
+
+            📁 No files uploaded yet.
+
+            <br><br>
+
+            Upload your first file using the Upload File section.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
