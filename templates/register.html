@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | SecureFile</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #07111f;
+            color: white;
+        }
+
+        .container {
+            width: 400px;
+            padding: 35px;
+            background: #0d1c30;
+            border: 1px solid #24405e;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.35);
+        }
+
+        .icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2563eb;
+            border-radius: 15px;
+            font-size: 28px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9fb2c8;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #315170;
+            border-radius: 8px;
+            background: #081626;
+            color: white;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .login {
+            text-align: center;
+            margin-top: 22px;
+            color: #9fb2c8;
+            font-size: 14px;
+        }
+
+        .login a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #9fb2c8;
+            text-decoration: none;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="icon">🔐</div>
+
+    <h1>Create Account</h1>
+
+    <p class="subtitle">
+        Create your SecureFile account
+    </p>
+
+    <form method="POST">
+
+        <label>Full Name</label>
+        <input type="text" name="name" placeholder="Enter your name" required>
+
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="Enter your email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Create a password" required>
+
+        <button type="submit">
+            Create Account
+        </button>
+
+    </form>
+
+    <div class="login">
+        Already have an account?
+        <a href="/login">Login</a>
+    </div>
+
+    <a href="/" class="back">← Back to Home</a>
+
+</div>
+
+</body>
+</html>

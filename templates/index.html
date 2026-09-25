@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Secure File Encryption System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #07111f;
+            color: white;
+        }
+
+        /* NAVBAR */
+        nav {
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            background: #0b1728;
+            border-bottom: 1px solid #1c314b;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2563eb;
+            border-radius: 10px;
+            font-size: 21px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            color: #dbeafe;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        nav ul li a:hover {
+            color: #60a5fa;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .login-btn,
+        .register-btn {
+            padding: 10px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            color: white;
+            border: 1px solid #315170;
+        }
+
+        .register-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* MOBILE MENU BUTTON */
+        .menu-btn {
+            display: none;
+            background: #10294a;
+            color: white;
+            border: 1px solid #315170;
+            border-radius: 7px;
+            padding: 9px 12px;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 560px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 70px 7%;
+            gap: 50px;
+        }
+
+        .hero-content {
+            max-width: 650px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #10294a;
+            color: #60a5fa;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            line-height: 1.12;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 span {
+            color: #3b82f6;
+        }
+
+        .hero p {
+            color: #a9bad0;
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            padding: 14px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary-btn {
+            border: 1px solid #315170;
+            color: white;
+        }
+
+        /* SECURITY CARD */
+        .security-card {
+            width: 360px;
+            min-height: 360px;
+            background: #0d1c30;
+            border: 1px solid #24405e;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+
+        .lock {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #102f58;
+            border-radius: 50%;
+            font-size: 40px;
+        }
+
+        .security-card h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .security-card p {
+            text-align: center;
+            color: #9fb2c8;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .status {
+            margin-top: 30px;
+            padding: 13px;
+            background: #0b2730;
+            color: #4ade80;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* FEATURES */
+        .features {
+            padding: 70px 7%;
+            background: #091522;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title h2 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: #9fb2c8;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .feature-card {
+            padding: 30px;
+            background: #0d1c30;
+            border: 1px solid #203951;
+            border-radius: 14px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 18px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: #9fb2c8;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 25px 7%;
+            text-align: center;
+            color: #8295ab;
+            background: #06101c;
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+
+            nav {
+                padding: 0 5%;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 75px;
+                left: 0;
+                width: 100%;
+                background: #0b1728;
+                border-bottom: 1px solid #1c314b;
+                flex-direction: column;
+                gap: 0;
+                padding: 10px 0;
+                z-index: 1000;
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav ul li {
+                width: 100%;
+            }
+
+            nav ul li a {
+                display: block;
+                padding: 14px 7%;
+            }
+
+            nav ul li a:hover {
+                background: #10294a;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 55px 5%;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .security-card {
+                width: 100%;
+                max-width: 360px;
+            }
+
+            .features {
+                padding: 55px 5%;
+            }
+
+            .section-title h2 {
+                font-size: 29px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .logo {
+                font-size: 17px;
+            }
+
+            .logo-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+
+            .hero {
+                padding: 45px 5%;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .primary-btn,
+            .secondary-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .security-card {
+                padding: 28px 22px;
+            }
+
+            .feature-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+
+        <div class="logo">
+            <div class="logo-icon">🔐</div>
+            <span>SecureFile</span>
+        </div>
+
+        <ul id="navMenu">
+            <li><a href="/" onclick="closeMenu()">Home</a></li>
+            <li><a href="#features" onclick="closeMenu()">Features</a></li>
+            <li><a href="#about" onclick="closeMenu()">About</a></li>
+            <li><a href="/login" onclick="closeMenu()">Login</a></li>
+            <li><a href="/register" onclick="closeMenu()">Register</a></li>
+        </ul>
+
+        <div class="nav-buttons">
+            <a href="/login" class="login-btn">Login</a>
+            <a href="/register" class="register-btn">Register</a>
+        </div>
+
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    </nav>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                🔒 Secure • Private • Reliable
+            </div>
+
+            <h1>
+                Protect Your Files With
+                <span>Secure Encryption</span>
+            </h1>
+
+            <p>
+                Secure File Encryption System is a web-based security
+                platform that helps users protect their important files
+                through encryption and secure access.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/register" class="primary-btn">
+                    Get Started →
+                </a>
+
+                <a href="#features" class="secondary-btn">
+                    Explore Features
+                </a>
+            </div>
+
+        </div>
+
+
+        <div class="security-card">
+
+            <div class="lock">
+                🔐
+            </div>
+
+            <h2>Your Files. Your Security.</h2>
+
+            <p>
+                Upload your files, encrypt them securely and access
+                them whenever you need them.
+            </p>
+
+            <div class="status">
+                ✓ Secure Encryption System Active
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+
+        <div class="section-title">
+
+            <h2>Powerful Security Features</h2>
+
+            <p>
+                Everything you need to protect your important files.
+            </p>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <!-- FILE ENCRYPTION -->
+            <a href="/dashboard" class="feature-card">
+
+                <div class="feature-icon">🔐</div>
+
+                <h3>File Encryption</h3>
+
+                <p>
+                    Encrypt important files before storing or sharing
+                    them using secure cryptographic methods.
+                </p>
+
+            </a>
+
+
+            <!-- SECURE ACCESS -->
+            <a href="/login" class="feature-card">
+
+                <div class="feature-icon">🛡️</div>
+
+                <h3>Secure Access</h3>
+
+                <p>
+                    User authentication helps ensure that only
+                    authorized users can access protected files.
+                </p>
+
+            </a>
+
+
+            <!-- FILE DECRYPTION -->
+            <a href="/dashboard" class="feature-card">
+
+                <div class="feature-icon">🔓</div>
+
+                <h3>File Decryption</h3>
+
+                <p>
+                    Authorized users can decrypt their encrypted
+                    files and retrieve the original content.
+                </p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- ABOUT -->
+    <section class="features" id="about">
+
+        <div class="section-title">
+
+            <h2>About The Project</h2>
+
+            <p>
+                A college Minor Project focused on file security
+                and data protection.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        © 2026 Secure File Encryption System 
+
+    </footer>
+
+
+    <!-- MOBILE MENU SCRIPT -->
+    <script>
+
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("active");
+        }
+
+        function closeMenu() {
+            document.getElementById("navMenu").classList.remove("active");
+        }
+
+    </script>
+
+</body>
+</html>

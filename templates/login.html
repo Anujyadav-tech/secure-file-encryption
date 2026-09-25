@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | SecureFile</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #07111f;
+            color: white;
+        }
+
+        .login-container {
+            width: 400px;
+            padding: 38px;
+            background: #0d1c30;
+            border: 1px solid #24405e;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2563eb;
+            border-radius: 16px;
+            font-size: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9fb2c8;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #315170;
+            border-radius: 8px;
+            background: #081626;
+            color: white;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .register {
+            text-align: center;
+            margin-top: 22px;
+            color: #9fb2c8;
+            font-size: 14px;
+        }
+
+        .register a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #9fb2c8;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .security-note {
+            margin-top: 25px;
+            padding: 12px;
+            background: #0b2730;
+            border-radius: 8px;
+            text-align: center;
+            color: #4ade80;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="icon">🔐</div>
+
+    <h1>Welcome Back</h1>
+
+    <p class="subtitle">
+        Login to access your secure files
+    </p>
+
+    <form method="POST">
+
+        <label>Email Address</label>
+
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+        >
+
+        <button type="submit">
+            Login Securely
+        </button>
+
+    </form>
+
+    <div class="register">
+        Don't have an account?
+        <a href="/register">Create Account</a>
+    </div>
+
+    <a href="/" class="back">
+        ← Back to Home
+    </a>
+
+    <div class="security-note">
+        🛡️ Your credentials are securely protected
+    </div>
+
+</div>
+
+</body>
+</html>
